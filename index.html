@@ -1,0 +1,3244 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c1011" id="theme-color">
+
+  <title>Muhammad Talha — Unity Game Developer</title>
+  <meta name="description"
+        content="Muhammad Talha — Unity and C# game developer in Lahore. Explore gameplay systems, published team contributions, project reconstruction, and personal work.">
+
+  <link rel="canonical" href="https://talha-gamedev.github.io/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Muhammad Talha — Code. Play. Repeat.">
+  <meta property="og:description"
+        content="Unity, C#, mobile gameplay, and the systems behind the experience.">
+  <meta property="og:url" content="https://talha-gamedev.github.io/">
+  <meta property="og:image"
+        content="https://talha-gamedev.github.io/profile.png">
+  <meta name="twitter:card" content="summary">
+
+  <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230c1011'/%3E%3Cpath d='M15 19h34v8H36v23h-8V27H15z' fill='%23c7f786'/%3E%3C/svg%3E">
+
+  <!-- Optional fonts. The page also works with system-font fallbacks. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
+  <!-- Apply preferences before the page paints. -->
+  <script>
+    (() => {
+      let theme = "";
+      let paused = false;
+
+      try {
+        theme = localStorage.getItem("talha-theme") || "";
+        paused = localStorage.getItem("talha-motion") === "off";
+      } catch {
+        // Storage may be blocked. Preferences still work for this visit.
+      }
+
+      if (!["dark", "light"].includes(theme)) {
+        theme = window.matchMedia("(prefers-color-scheme: light)").matches
+          ? "light"
+          : "dark";
+      }
+
+      document.documentElement.dataset.theme = theme;
+
+      if (
+        paused ||
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ) {
+        document.documentElement.classList.add("motion-off");
+      }
+    })();
+  </script>
+
+  <style>
+    /* ======================================================
+       DESIGN SYSTEM
+       ====================================================== */
+
+    :root {
+      color-scheme: dark;
+      --bg: #0c1011;
+      --panel: #141b1c;
+      --raised: #1a2423;
+      --ink: #eef2e9;
+      --muted: #a5b3ac;
+      --line: #2d3933;
+      --accent: #c7f786;
+      --on-accent: #142109;
+      --blue: #95ceff;
+      --purple: #c7afff;
+      --nav: #0c1011ed;
+      --glow: 177, 231, 112;
+      --shadow: 0 22px 65px #00000026;
+      --display: "Space Grotesk", "Segoe UI", sans-serif;
+      --body: "Manrope", "Segoe UI", sans-serif;
+      --mono: "IBM Plex Mono", ui-monospace, monospace;
+      --ease: cubic-bezier(.22, 1, .36, 1);
+    }
+
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #f5f6ef;
+      --panel: #ffffff;
+      --raised: #edf0e6;
+      --ink: #17211c;
+      --muted: #536159;
+      --line: #d5ded2;
+      --accent: #386516;
+      --on-accent: #ffffff;
+      --blue: #285f9a;
+      --purple: #7543a7;
+      --nav: #f5f6eff0;
+      --glow: 74, 124, 37;
+      --shadow: 0 20px 55px #293d2110;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 115px;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--body);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      transition: background-color .3s, color .3s;
+    }
+
+    ::selection {
+      color: var(--on-accent);
+      background: var(--accent);
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input, select { font: inherit; }
+    button { color: inherit; cursor: pointer; }
+    button, a { touch-action: manipulation; }
+    img, svg { display: block; max-width: 100%; }
+    h1, h2, h3, h4, p { margin-top: 0; }
+    h1, h2, h3, h4 { font-family: var(--display); }
+    button:disabled { cursor: default; }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 5px;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip {
+      position: fixed;
+      left: 15px;
+      top: 10px;
+      z-index: 200;
+      padding: 12px 18px;
+      border-radius: 8px;
+      background: var(--accent);
+      color: var(--on-accent);
+      transform: translateY(-160%);
+    }
+
+    .skip:focus { transform: none; }
+
+    .wrap {
+      width: min(1220px, calc(100% - 56px));
+      margin-inline: auto;
+    }
+
+    main, footer {
+      position: relative;
+      z-index: 1;
+    }
+
+    .section { padding-block: 95px; }
+    .accent { color: var(--accent); }
+    .muted { color: var(--muted); }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 19px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      flex: 0 0 7px;
+      border-radius: 2px;
+      background: var(--accent);
+    }
+
+    .section-title {
+      margin-bottom: 0;
+      font-size: clamp(37px, 5vw, 66px);
+      font-weight: 500;
+      letter-spacing: -.065em;
+      line-height: 1.06;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 35px;
+      margin-bottom: 34px;
+    }
+
+    .section-head > p {
+      max-width: 360px;
+      margin-bottom: 3px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.9;
+    }
+
+    .button {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 13px;
+      min-height: 48px;
+      padding: 12px 18px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.4;
+      transition: transform .3s var(--ease), border-color .3s;
+    }
+
+    .button:hover {
+      transform: translateY(-3px);
+      border-color: var(--accent);
+    }
+
+    .button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .button.small {
+      min-height: 40px;
+      padding: 9px 12px;
+      font-size: 11px;
+    }
+
+    .button::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(110deg, transparent 35%, #ffffff20, transparent 65%);
+      transform: translateX(-120%);
+      pointer-events: none;
+    }
+
+    .button:hover::after {
+      animation: sweep .7s var(--ease);
+    }
+
+    @keyframes sweep { to { transform: translateX(120%); } }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 11px;
+      align-items: center;
+    }
+
+    .tag {
+      display: inline-flex;
+      padding: 5px 9px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--raised);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 10px;
+      line-height: 1.6;
+    }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .icon { width: 24px; height: 24px; }
+    .svg-library { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+    #particles {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      opacity: .45;
+      pointer-events: none;
+    }
+
+    #progress {
+      position: fixed;
+      inset: 0 0 auto;
+      height: 3px;
+      z-index: 100;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      pointer-events: none;
+    }
+
+    /* ======================================================
+       NAVIGATION
+       ====================================================== */
+
+    .site-header {
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      width: min(1260px, calc(100% - 28px));
+      min-height: 70px;
+      padding: 12px 16px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--nav);
+      backdrop-filter: blur(18px);
+      transform: translateX(-50%);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      font-family: var(--display);
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -.04em;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 35px;
+      height: 35px;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--raised);
+      color: var(--accent);
+    }
+
+    .brand-mark svg { width: 23px; height: 23px; }
+
+    .nav {
+      display: flex;
+      gap: 23px;
+      align-items: center;
+    }
+
+    .nav a {
+      padding-block: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .nav a:hover, .nav a.active { color: var(--accent); }
+
+    .header-controls { display: flex; align-items: center; gap: 7px; }
+
+    .control {
+      min-height: 40px;
+      padding: 8px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel);
+      font-family: var(--mono);
+      font-size: 10px;
+      white-space: nowrap;
+    }
+
+    .control:hover { border-color: var(--accent); }
+    .control:disabled { opacity: .65; }
+    #menu-toggle { display: none; }
+
+    /* ======================================================
+       HERO / DEVELOPER CARD
+       ====================================================== */
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.04fr 1fr;
+      align-items: center;
+      gap: 66px;
+      min-height: 810px;
+      padding-top: 160px;
+      padding-bottom: 75px;
+    }
+
+    .hero h1 {
+      margin-bottom: 26px;
+      font-size: clamp(72px, 8.3vw, 116px);
+      font-weight: 500;
+      letter-spacing: -.085em;
+      line-height: .98;
+    }
+
+    .hero h1 em {
+      color: var(--accent);
+      font-style: normal;
+    }
+
+    .hero-description {
+      max-width: 490px;
+      margin-bottom: 27px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.95;
+    }
+
+    .hero-description strong { color: var(--ink); font-weight: 700; }
+
+    .hero-data {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      max-width: 470px;
+      margin-top: 37px;
+      padding-top: 22px;
+      border-top: 1px solid var(--line);
+    }
+
+    .hero-data strong {
+      display: block;
+      font-family: var(--display);
+      font-size: 22px;
+      letter-spacing: -.05em;
+      font-weight: 500;
+    }
+
+    .hero-data span {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .developer-stage {
+      position: relative;
+      padding: 22px;
+      isolation: isolate;
+    }
+
+    .developer-stage::before {
+      content: "";
+      position: absolute;
+      inset: -25px;
+      z-index: -1;
+      border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(var(--glow), .12), transparent 70%);
+    }
+
+    .orbit {
+      position: absolute;
+      inset: 5px -14px;
+      border: 1px dashed var(--line);
+      border-radius: 50%;
+      animation: orbit 30s linear infinite;
+      pointer-events: none;
+    }
+
+    .orbit::before {
+      content: "";
+      position: absolute;
+      top: 12%;
+      left: 14%;
+      width: 11px;
+      height: 11px;
+      border: 3px solid var(--bg);
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+
+    @keyframes orbit { to { transform: rotate(360deg); } }
+
+    [data-tilt] {
+      --rx: 0deg;
+      --ry: 0deg;
+      transform: perspective(1200px) rotateX(var(--rx)) rotateY(var(--ry));
+      transition: transform .35s var(--ease);
+    }
+
+    .developer-card {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .window-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      padding: 15px 17px;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+    }
+
+    .window-dots { display: flex; gap: 4px; }
+
+    .window-dots i {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--muted);
+      opacity: .45;
+    }
+
+    .portrait {
+      position: relative;
+      aspect-ratio: 4 / 4.6;
+      overflow: hidden;
+      background: #23302b;
+    }
+
+    .portrait-fallback {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: #c7f786;
+      font-family: var(--display);
+      font-size: 140px;
+      letter-spacing: -.12em;
+    }
+
+    .portrait img {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 50% 24%;
+    }
+
+    .portrait::after {
+      content: "";
+      position: absolute;
+      inset: 45% 0 0;
+      background: linear-gradient(transparent, #07100bec);
+      pointer-events: none;
+    }
+
+    .portrait-caption {
+      position: absolute;
+      right: 24px;
+      bottom: 23px;
+      left: 24px;
+      z-index: 2;
+      color: #f4faed;
+    }
+
+    .portrait-caption strong {
+      display: block;
+      font-family: var(--display);
+      font-size: 29px;
+      font-weight: 500;
+      letter-spacing: -.05em;
+      line-height: 1.1;
+    }
+
+    .portrait-caption span {
+      display: block;
+      margin-top: 9px;
+      color: #d5e1cf;
+      font-family: var(--mono);
+      font-size: 10px;
+    }
+
+    .developer-bottom {
+      display: flex;
+      justify-content: space-between;
+      padding: 13px 18px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 9px;
+    }
+
+    .floating-label {
+      position: absolute;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 11px 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--nav);
+      color: var(--ink);
+      box-shadow: var(--shadow);
+      font-family: var(--mono);
+      font-size: 10px;
+      animation: float 6s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .floating-label svg { width: 18px; height: 18px; color: var(--accent); }
+    .floating-label.one { top: 90px; left: -7px; }
+    .floating-label.two { right: -8px; bottom: 110px; animation-delay: -2s; }
+
+    @keyframes float {
+      50% { transform: translateY(-9px); }
+    }
+
+    .ticker {
+      overflow: hidden;
+      padding-block: 21px;
+      border-block: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    .ticker-track {
+      display: flex;
+      width: max-content;
+      animation: marquee 35s linear infinite;
+    }
+
+    .ticker-group {
+      display: flex;
+      flex-shrink: 0;
+      align-items: center;
+      gap: 33px;
+      padding-right: 33px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .06em;
+    }
+
+    .ticker-group b { color: var(--accent); font-weight: 400; }
+    .ticker:hover .ticker-track { animation-play-state: paused; }
+    @keyframes marquee { to { transform: translateX(-50%); } }
+
+    /* ======================================================
+       FEATURED PROJECTS
+       ====================================================== */
+
+    .featured-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+    }
+
+    .feature-card {
+      height: 100%;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .feature-card:hover { border-color: var(--accent); }
+
+    .cover {
+      position: relative;
+      display: grid;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      place-items: center;
+      background:
+        radial-gradient(ellipse at center, hsl(var(--hue, 100) 35% 24%), transparent 80%),
+        #121a1b;
+      color: hsl(var(--hue, 100) 65% 78%);
+      isolation: isolate;
+    }
+
+    .cover::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(#ffffff06 1px, transparent 1px),
+        linear-gradient(90deg, #ffffff06 1px, transparent 1px);
+      background-size: 28px 28px;
+      transform: perspective(450px) rotateX(35deg) scale(1.4);
+    }
+
+    .cover-symbol {
+      position: relative;
+      width: 105px;
+      height: 105px;
+      padding: 18px;
+      border: 1px solid #ffffff24;
+      border-radius: 26px;
+      background: #ffffff06;
+      transform: rotate(-8deg);
+      transition: transform .6s var(--ease);
+      box-shadow: 15px 20px 0 #00000012;
+    }
+
+    .cover-symbol svg { width: 100%; height: 100%; }
+    .feature-card:hover .cover-symbol { transform: rotate(4deg) translateY(-7px); }
+
+    .store-art {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform .8s var(--ease);
+    }
+
+    .feature-card:hover .store-art { transform: scale(1.045); }
+
+    .art-label {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      z-index: 2;
+      padding: 5px 8px;
+      border: 1px solid #ffffff25;
+      border-radius: 5px;
+      background: #0b1114de;
+      color: #e4eddf;
+      font-family: var(--mono);
+      font-size: 8px;
+    }
+
+    .feature-copy { padding: 25px; }
+
+    .project-status {
+      display: inline-block;
+      margin-bottom: 12px;
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+
+    .feature-copy h3 {
+      margin-bottom: 13px;
+      font-size: 29px;
+      font-weight: 500;
+      letter-spacing: -.045em;
+      line-height: 1.15;
+    }
+
+    .feature-copy > p {
+      margin-bottom: 19px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.85;
+    }
+
+    .project-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 13px;
+      margin-top: 23px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+
+    .text-button {
+      min-height: 36px;
+      padding: 5px 0;
+      border: 0;
+      background: transparent;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 800;
+      text-align: left;
+    }
+
+    .text-button:hover { text-decoration: underline; text-underline-offset: 5px; }
+
+    .store-link {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 10px;
+    }
+
+    .store-link:hover { color: var(--accent); }
+
+    .caption {
+      margin: 19px 0 0;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 10px;
+      line-height: 1.8;
+    }
+
+    /* ======================================================
+       SEARCHABLE CATALOGUE
+       ====================================================== */
+
+    .library-section {
+      border-block: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    .library-tools {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 17px;
+      margin-bottom: 22px;
+    }
+
+    .search {
+      flex: 1 1 250px;
+      max-width: 365px;
+      min-height: 47px;
+      padding: 12px 15px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 12px;
+    }
+
+    .search::placeholder { color: var(--muted); }
+
+    .filter-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .filter {
+      min-height: 39px;
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .filter[aria-pressed="true"] {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .result-count {
+      margin-bottom: 21px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 10px;
+    }
+
+    .catalogue {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .catalogue-card {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: var(--bg);
+      transition: border-color .3s;
+    }
+
+    .catalogue-card:hover { border-color: var(--accent); }
+
+    .catalogue-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .game-icon {
+      display: grid;
+      width: 43px;
+      height: 43px;
+      flex: 0 0 43px;
+      place-items: center;
+      border: 1px solid hsl(var(--hue, 100) 25% 33%);
+      border-radius: 12px;
+      background: hsl(var(--hue, 100) 23% 17%);
+      color: hsl(var(--hue, 100) 65% 79%);
+    }
+
+    .game-icon svg { width: 25px; height: 25px; }
+    .catalogue-top .project-status { margin: 0; font-size: 8px; }
+
+    .catalogue-card h3 {
+      margin-bottom: 10px;
+      font-size: 19px;
+      font-weight: 500;
+      line-height: 1.25;
+      letter-spacing: -.035em;
+    }
+
+    .catalogue-card > p {
+      margin-bottom: 17px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.85;
+    }
+
+    .catalogue-card .project-actions {
+      margin-top: auto;
+      padding-top: 12px;
+    }
+
+    .catalogue-card .text-button { font-size: 11px; }
+
+    .empty-state {
+      padding: 35px;
+      border: 1px dashed var(--line);
+      border-radius: 14px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    /* ======================================================
+       EXPERTISE
+       ====================================================== */
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 19px;
+    }
+
+    .skill-card {
+      padding: 27px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--panel);
+      transition: transform .4s var(--ease), border-color .3s;
+    }
+
+    .skill-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent);
+    }
+
+    .skill-card > .icon {
+      width: 35px;
+      height: 35px;
+      margin-bottom: 28px;
+      color: var(--accent);
+    }
+
+    .skill-card h3 {
+      margin-bottom: 13px;
+      font-size: 25px;
+      font-weight: 500;
+      letter-spacing: -.04em;
+      line-height: 1.2;
+    }
+
+    .skill-card p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.9;
+    }
+
+    /* ======================================================
+       PLAYABLE MEMORY DEMO
+       ====================================================== */
+
+    .lab-panel {
+      display: grid;
+      grid-template-columns: .85fr 1.15fr;
+      gap: 55px;
+      align-items: center;
+      padding: 40px;
+      border: 1px solid var(--line);
+      border-radius: 25px;
+      background:
+        radial-gradient(ellipse at 0% 0%, rgba(var(--glow), .09), transparent 65%),
+        var(--panel);
+    }
+
+    .lab-copy .section-title { margin-bottom: 23px; }
+
+    .lab-copy > p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.9;
+    }
+
+    .lab-copy .tag { margin-bottom: 12px; }
+
+    .memory-shell { position: relative; min-width: 0; }
+
+    .memory-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+
+    .memory-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .memory-card {
+      aspect-ratio: 1;
+      min-width: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 12px;
+      background: transparent;
+      perspective: 600px;
+    }
+
+    .memory-inner {
+      position: relative;
+      display: block;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform .45s var(--ease);
+    }
+
+    .memory-card.open .memory-inner { transform: rotateY(180deg); }
+
+    .memory-face {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--raised);
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      font-family: var(--mono);
+    }
+
+    .memory-front {
+      color: var(--muted);
+      font-size: 27px;
+    }
+
+    .memory-back {
+      background: var(--bg);
+      color: var(--accent);
+      transform: rotateY(180deg);
+      font-size: clamp(12px, 2vw, 21px);
+      font-weight: 500;
+    }
+
+    .memory-card.matched .memory-back {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .memory-card:hover .memory-front { border-color: var(--accent); }
+
+    .memory-message {
+      min-height: 3.6em;
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 10px;
+      line-height: 1.8;
+    }
+
+    .confetti {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .spark {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 6px;
+      height: 6px;
+      border-radius: 1px;
+      background: var(--accent);
+      animation: burst .9s var(--ease) forwards;
+    }
+
+    @keyframes burst {
+      from { transform: translate(0, 0) rotate(0); opacity: 1; }
+      to {
+        transform: translate(var(--x), var(--y)) rotate(220deg);
+        opacity: 0;
+      }
+    }
+
+    /* ======================================================
+       ABOUT / TIMELINE / CONTACT
+       ====================================================== */
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 70px;
+      align-items: start;
+    }
+
+    .about-copy .section-title { margin-bottom: 25px; }
+
+    .about-copy > p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.95;
+    }
+
+    .about-copy strong { color: var(--ink); }
+
+    .timeline {
+      --timeline-progress: 0;
+      position: relative;
+      padding-left: 30px;
+    }
+
+    .timeline::before, .timeline::after {
+      content: "";
+      position: absolute;
+      top: 10px;
+      bottom: 20px;
+      left: 5px;
+      width: 1px;
+      background: var(--line);
+    }
+
+    .timeline::after {
+      background: var(--accent);
+      transform: scaleY(var(--timeline-progress));
+      transform-origin: top;
+    }
+
+    .timeline-item { position: relative; padding-bottom: 30px; }
+
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      top: 7px;
+      left: -29px;
+      z-index: 2;
+      width: 9px;
+      height: 9px;
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+      background: var(--bg);
+    }
+
+    .timeline-date {
+      display: block;
+      margin-bottom: 9px;
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .04em;
+    }
+
+    .timeline-item h3 {
+      margin-bottom: 9px;
+      font-size: 23px;
+      font-weight: 500;
+      letter-spacing: -.04em;
+    }
+
+    .timeline-item p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.9;
+    }
+
+    .source-card {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 22px;
+      margin-top: 45px;
+      padding: 25px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--panel);
+    }
+
+    .source-card h3 {
+      margin-bottom: 4px;
+      font-size: 22px;
+      font-weight: 500;
+      letter-spacing: -.035em;
+    }
+
+    .source-card p {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .contact {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 50px;
+      padding: 52px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 25px;
+      background:
+        radial-gradient(ellipse at 100% 0%, rgba(var(--glow), .1), transparent 65%),
+        var(--panel);
+    }
+
+    .contact h2 {
+      margin-bottom: 0;
+      font-size: clamp(49px, 6vw, 80px);
+      font-weight: 500;
+      line-height: 1.02;
+      letter-spacing: -.07em;
+    }
+
+    .contact-copy > p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.9;
+    }
+
+    .email-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 23px;
+    }
+
+    .email-row > a {
+      min-width: 0;
+      color: var(--ink);
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .social-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 23px;
+      margin-top: 21px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+
+    .social-links a:hover { color: var(--accent); }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 25px;
+      padding-block: 35px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 10px;
+    }
+
+    /* ======================================================
+       PROJECT DIALOG / NOTIFICATIONS
+       ====================================================== */
+
+    .project-dialog {
+      width: min(800px, calc(100% - 26px));
+      max-height: 90vh;
+      max-height: 90dvh;
+      padding: 0;
+      overflow-y: auto;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: var(--panel);
+      color: var(--ink);
+      box-shadow: 0 35px 120px #00000070;
+    }
+
+    .project-dialog::backdrop {
+      background: #06100bd6;
+      backdrop-filter: blur(8px);
+    }
+
+    .project-dialog[open] {
+      animation: dialog-in .3s var(--ease);
+    }
+
+    @keyframes dialog-in {
+      from { opacity: 0; transform: translateY(20px) scale(.98); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .dialog-head {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 15px 23px;
+      border-bottom: 1px solid var(--line);
+      background: var(--nav);
+      backdrop-filter: blur(14px);
+    }
+
+    .dialog-head .eyebrow { margin: 0; font-size: 9px; }
+
+    .close {
+      width: 38px;
+      height: 38px;
+      flex: 0 0 38px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: var(--panel);
+      font-size: 22px;
+    }
+
+    .dialog-body { padding: 28px; }
+
+    .dialog-body h2 {
+      margin-bottom: 17px;
+      font-size: clamp(30px, 4vw, 44px);
+      font-weight: 500;
+      letter-spacing: -.05em;
+      line-height: 1.13;
+    }
+
+    .dialog-body > p,
+    .dialog-body li {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.9;
+    }
+
+    .dialog-body h3 {
+      margin: 26px 0 12px;
+      font-size: 22px;
+      font-weight: 500;
+      letter-spacing: -.04em;
+    }
+
+    .dialog-body ul { padding-left: 20px; }
+    .dialog-body li { padding-left: 4px; margin-bottom: 9px; }
+    .dialog-body li::marker { color: var(--accent); }
+
+    .scope {
+      margin: 25px 0;
+      padding: 17px;
+      border-left: 2px solid var(--accent);
+      border-radius: 0 10px 10px 0;
+      background: var(--raised);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.9;
+    }
+
+    .dialog-cover .cover { max-height: 280px; }
+
+    .toast {
+      position: fixed;
+      bottom: 22px;
+      left: 50%;
+      z-index: 200;
+      width: max-content;
+      max-width: calc(100% - 30px);
+      padding: 12px 18px;
+      border: 1px solid var(--accent);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--ink);
+      box-shadow: var(--shadow);
+      font-size: 12px;
+      text-align: center;
+      opacity: 0;
+      transform: translate(-50%, 15px);
+      transition: opacity .25s, transform .25s var(--ease);
+      pointer-events: none;
+    }
+
+    .toast.visible { opacity: 1; transform: translate(-50%, 0); }
+
+    /* Reveal content is visible unless JavaScript enables the effect. */
+    .reveal {
+      transition: opacity .75s var(--ease), transform .75s var(--ease);
+    }
+
+    .reveal.pending { opacity: 0; transform: translateY(24px); }
+
+    .offscreen .ambient,
+    .tab-hidden .ambient {
+      animation-play-state: paused !important;
+    }
+
+    .motion-off { scroll-behavior: auto; }
+
+    .motion-off *,
+    .motion-off *::before,
+    .motion-off *::after {
+      animation: none !important;
+      transition-duration: .01ms !important;
+    }
+
+    .motion-off .reveal.pending { opacity: 1; transform: none; }
+    .motion-off [data-tilt] { transform: none !important; }
+
+    /* ======================================================
+       RESPONSIVE LAYOUT
+       ====================================================== */
+
+    @media (max-width: 1100px) {
+      .nav { gap: 15px; }
+      .hero { gap: 35px; }
+      .lab-panel { gap: 30px; padding: 30px; }
+      .about-grid { gap: 40px; }
+    }
+
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: 1fr;
+        gap: 42px;
+        min-height: auto;
+        padding-top: 145px;
+      }
+
+      .hero h1 { font-size: clamp(78px, 12vw, 112px); }
+      .hero-description { max-width: 610px; }
+      .developer-stage { width: min(510px, 100%); margin-inline: auto; }
+      .catalogue { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .skills-grid { grid-template-columns: 1fr; }
+      .lab-panel, .about-grid { grid-template-columns: 1fr; }
+      .memory-shell { width: min(500px, 100%); margin-inline: auto; }
+      .contact { padding: 35px; gap: 30px; }
+      .header-brand-name { display: none; }
+    }
+
+    @media (max-width: 680px) {
+      html { scroll-padding-top: 105px; }
+      .wrap { width: calc(100% - 34px); }
+      .section { padding-block: 70px; }
+      .site-header { top: 10px; padding: 10px 12px; gap: 12px; }
+      .header-brand-name { display: inline; font-size: 16px; }
+      .header-controls { margin-left: auto; }
+      .control { font-size: 9px; padding-inline: 9px; }
+      .enhanced #menu-toggle { display: inline-flex; align-items: center; }
+
+      .site-header { flex-wrap: wrap; }
+      .nav { flex-wrap: wrap; width: 100%; order: 3; }
+
+      .enhanced .nav {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        right: 0;
+        display: none;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+      }
+
+      .enhanced .nav.open { display: flex; }
+      .enhanced .nav a { padding: 13px; }
+
+      .hero { padding-top: 130px; padding-bottom: 55px; }
+      .hero h1 { font-size: clamp(72px, 17vw, 100px); }
+      .hero .eyebrow { font-size: 9px; letter-spacing: .08em; }
+      .hero-description { font-size: 14px; }
+      .hero-data strong { font-size: 20px; }
+      .hero-data span { font-size: 8px; }
+      .hero .actions .button { flex: 1 1 145px; }
+
+      .developer-stage { padding: 17px; }
+      .floating-label { padding: 9px; font-size: 9px; }
+      .floating-label.one { left: 0; top: 80px; }
+      .floating-label.two { right: 0; }
+      .portrait-caption { left: 20px; }
+      .portrait-caption strong { font-size: 27px; }
+
+      .section-head { flex-direction: column; align-items: flex-start; gap: 20px; }
+      .section-head > p { max-width: 100%; font-size: 13px; }
+      .featured-grid, .catalogue { grid-template-columns: 1fr; }
+      .feature-copy { padding: 22px; }
+      .feature-copy h3 { font-size: 27px; }
+      .catalogue-card { padding: 20px; }
+      .search { max-width: none; }
+      .filter { padding: 9px 10px; }
+
+      .lab-panel { padding: 24px 18px; }
+      .memory-grid { gap: 8px; }
+      .memory-back { font-size: 16px; }
+      .contact { grid-template-columns: 1fr; padding: 30px 23px; }
+      .contact h2 { font-size: 61px; }
+
+      footer { font-size: 9px; align-items: flex-start; }
+      footer > span { max-width: 235px; }
+      .dialog-body { padding: 22px; }
+    }
+
+    @media (max-width: 380px) {
+      .header-brand-name { display: none; }
+      .hero h1 { font-size: 65px; }
+      .memory-back { font-size: 13px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation: none !important;
+        transition-duration: .01ms !important;
+      }
+      .reveal.pending { opacity: 1; transform: none; }
+      [data-tilt] { transform: none !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <canvas id="particles" aria-hidden="true"></canvas>
+  <div id="progress" aria-hidden="true"></div>
+
+  <!-- Small, original interface icons. These are not game logos. -->
+  <svg class="svg-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <symbol id="i-cube" viewBox="0 0 24 24">
+        <path d="m12 2 9 5v10l-9 5-9-5V7Z M3 7l9 5 9-5 M12 12v10"
+              fill="none" stroke="currentColor" stroke-width="1.5"
+              stroke-linejoin="round"/>
+      </symbol>
+
+      <symbol id="i-code" viewBox="0 0 24 24">
+        <path d="m8 6-6 6 6 6 M16 6l6 6-6 6 M14 3l-4 18"
+              fill="none" stroke="currentColor" stroke-width="1.5"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </symbol>
+
+      <symbol id="i-store" viewBox="0 0 24 24">
+        <path d="M4 10v11h16V10 M3 4h18l1 6H2Z M9 21v-7h6v7 M7 4l-1 6 M12 4v6 M17 4l1 6"
+              fill="none" stroke="currentColor" stroke-width="1.5"
+              stroke-linejoin="round"/>
+      </symbol>
+
+      <symbol id="i-film" viewBox="0 0 24 24">
+        <rect x="3" y="3" width="18" height="18" rx="3"
+              fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M7 3v18 M17 3v18 M3 8h4 M3 16h4 M17 8h4 M17 16h4 M10 8l5 4-5 4Z"
+              fill="none" stroke="currentColor" stroke-width="1.5"
+              stroke-linejoin="round"/>
+      </symbol>
+
+      <symbol id="i-bank" viewBox="0 0 24 24">
+        <path d="m2 8 10-6 10 6Z M4 11v8 M9 11v8 M15 11v8 M20 11v8 M2 22h20"
+              fill="none" stroke="currentColor" stroke-width="1.5"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </symbol>
+
+      <symbol id="i-car" viewBox="0 0 24 24">
+        <path d="m5 5-2 7v7h18v-7l-2-7Z M3 12h18 M7 16h1 M16 16h1 M6 19v3 M18 19v3"
+              fill="none" stroke="currentColor" stroke-width="1.5"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </symbol>
+
+      <symbol id="i-sword" viewBox="0 0 24 24">
+        <path d="m14 3 7-1-1 7-9 9-5-5Z M4 11l9 9 M3 21l5-5 M2 18l4 4"
+              fill="none" stroke="currentColor" stroke-width="1.5"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </symbol>
+
+      <symbol id="i-dice" viewBox="0 0 24 24">
+        <rect x="3" y="3" width="18" height="18" rx="4"
+              fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <g fill="currentColor">
+          <circle cx="8" cy="8" r="1.3"/>
+          <circle cx="16" cy="8" r="1.3"/>
+          <circle cx="12" cy="12" r="1.3"/>
+          <circle cx="8" cy="16" r="1.3"/>
+          <circle cx="16" cy="16" r="1.3"/>
+        </g>
+      </symbol>
+
+      <symbol id="i-leaf" viewBox="0 0 24 24">
+        <path d="M12 22V11 M12 15C3 16 2 10 2 5c7 0 10 3 10 10Z M12 11C12 4 17 2 22 2c0 6-3 10-10 9Z"
+              fill="none" stroke="currentColor" stroke-width="1.5"
+              stroke-linejoin="round"/>
+      </symbol>
+
+      <symbol id="i-clean" viewBox="0 0 24 24">
+        <path d="m15 2-5 12 M6 13l9 4-3 5-10-4Z M17 9h5 M19.5 6.5v5 M4 3v4 M2 5h4"
+              fill="none" stroke="currentColor" stroke-width="1.5"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </symbol>
+
+      <symbol id="i-book" viewBox="0 0 24 24">
+        <path d="M12 5C8 2 4 2 2 3v16c4-1 7 0 10 2 3-2 6-3 10-2V3c-3-1-7 0-10 2Z M12 5v16"
+              fill="none" stroke="currentColor" stroke-width="1.5"
+              stroke-linejoin="round"/>
+      </symbol>
+
+      <symbol id="i-shirt" viewBox="0 0 24 24">
+        <path d="m8 3-6 4 3 5 3-2v12h8V10l3 2 3-5-6-4c0 4-8 4-8 0Z"
+              fill="none" stroke="currentColor" stroke-width="1.5"
+              stroke-linejoin="round"/>
+      </symbol>
+
+      <symbol id="i-kite" viewBox="0 0 24 24">
+        <path d="m12 2 8 7-8 9L4 9Z M12 2v16 M4 9h16 M12 18c-4 4 4 3 0 5"
+              fill="none" stroke="currentColor" stroke-width="1.5"
+              stroke-linejoin="round"/>
+      </symbol>
+
+      <symbol id="i-grid" viewBox="0 0 24 24">
+        <path d="M3 3h7v7H3Z M14 3h7v7h-7Z M3 14h7v7H3Z M14 14h7v7h-7Z"
+              fill="none" stroke="currentColor" stroke-width="1.5"
+              stroke-linejoin="round"/>
+      </symbol>
+
+      <symbol id="i-coffee" viewBox="0 0 24 24">
+        <path d="M3 8h13v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z M16 9h3a3 3 0 0 1 0 6h-3 M6 2v3 M10 1v4 M14 2v3"
+              fill="none" stroke="currentColor" stroke-width="1.5"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </symbol>
+
+      <symbol id="i-save" viewBox="0 0 24 24">
+        <path d="M3 3h15l3 3v15H3Z M7 3v6h9V3 M7 21v-8h10v8"
+              fill="none" stroke="currentColor" stroke-width="1.5"
+              stroke-linejoin="round"/>
+      </symbol>
+
+      <symbol id="i-network" viewBox="0 0 24 24">
+        <path d="M12 8v5 M5 16v-3h14v3"
+              fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M9 2h6v6H9Z M2 16h6v6H2Z M16 16h6v6h-6Z"
+              fill="none" stroke="currentColor" stroke-width="1.5"
+              stroke-linejoin="round"/>
+      </symbol>
+
+      <symbol id="i-copy" viewBox="0 0 24 24">
+        <rect x="8" y="8" width="12" height="12" rx="2"
+              fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M15 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h3"
+              fill="none" stroke="currentColor" stroke-width="1.5"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <header class="site-header">
+    <a class="brand" href="#home" aria-label="Muhammad Talha, home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg><use href="#i-cube"></use></svg>
+      </span>
+      <span class="header-brand-name">talha<span class="accent">.dev</span></span>
+    </a>
+
+    <nav class="nav" id="nav" aria-label="Main navigation">
+      <a href="#work">Work</a>
+      <a href="#library">All games</a>
+      <a href="#lab">Play</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+
+    <div class="header-controls">
+      <button class="control" id="theme-toggle" type="button" hidden>
+        Light
+      </button>
+      <button class="control" id="motion-toggle" type="button"
+              aria-label="Decorative motion" aria-pressed="true" hidden>
+        Motion on
+      </button>
+      <button class="control" id="menu-toggle" type="button"
+              aria-expanded="false" aria-controls="nav" hidden>
+        Menu
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- HERO -->
+    <section class="hero wrap ambient-scope" id="home">
+      <div class="hero-copy">
+        <p class="eyebrow reveal">Player 01 / Muhammad Talha</p>
+
+        <h1 class="reveal">
+          Code. Play.<br>
+          <em>Repeat.</em>
+        </h1>
+
+        <p class="hero-description reveal">
+          I’m a <strong>Unity &amp; C# game developer</strong> based in Lahore.
+          I build gameplay features and the systems behind them—from
+          simulation and persistence to integrations and project reconstruction.
+        </p>
+
+        <div class="actions reveal">
+          <a class="button primary" href="#work">Explore my work <span aria-hidden="true">↗</span></a>
+          <a class="button" href="./resume.pdf" download="Muhammad-Talha-Resume.pdf">
+            Download résumé <span aria-hidden="true">↓</span>
+          </a>
+        </div>
+
+        <div class="hero-data reveal">
+          <div><strong>Unity</strong><span>2D / 3D engine</span></div>
+          <div><strong>C#</strong><span>Core language</span></div>
+          <div><strong>Mobile</strong><span>Development focus</span></div>
+        </div>
+      </div>
+
+      <div class="developer-stage reveal">
+        <div class="orbit ambient" aria-hidden="true"></div>
+
+        <div class="floating-label one ambient" aria-hidden="true">
+          <svg><use href="#i-code"></use></svg>
+          Gameplay systems
+        </div>
+
+        <div class="floating-label two ambient" aria-hidden="true">
+          <svg><use href="#i-save"></use></svg>
+          State → Save → Play
+        </div>
+
+        <div class="developer-card" data-tilt>
+          <div class="window-bar">
+            <span>Developer.profile</span>
+            <span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          </div>
+
+          <div class="portrait">
+            <span class="portrait-fallback" aria-hidden="true">MT</span>
+            <img id="portrait" src="./profile.png"
+                 width="1248" height="1248"
+                 fetchpriority="high"
+                 alt="Portrait of Muhammad Talha">
+            <div class="portrait-caption">
+              <strong>Muhammad Talha</strong>
+              <span>UNITY GAME DEVELOPER · LAHORE, PK</span>
+            </div>
+          </div>
+
+          <div class="developer-bottom">
+            <span>Gameplay + systems</span>
+            <span class="accent">C# / Unity</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="ticker ambient-scope" aria-hidden="true">
+      <div class="ticker-track ambient">
+        <div class="ticker-group">
+          <span>UNITY</span><b>✦</b><span>C#</span><b>✦</b>
+          <span>GAMEPLAY SYSTEMS</span><b>✦</b><span>SAVE / LOAD</span><b>✦</b>
+          <span>ADDRESSABLES</span><b>✦</b><span>MOBILE GAMES</span><b>✦</b>
+          <span>PROJECT RECONSTRUCTION</span><b>✦</b>
+        </div>
+        <div class="ticker-group">
+          <span>UNITY</span><b>✦</b><span>C#</span><b>✦</b>
+          <span>GAMEPLAY SYSTEMS</span><b>✦</b><span>SAVE / LOAD</span><b>✦</b>
+          <span>ADDRESSABLES</span><b>✦</b><span>MOBILE GAMES</span><b>✦</b>
+          <span>PROJECT RECONSTRUCTION</span><b>✦</b>
+        </div>
+      </div>
+    </div>
+
+    <!-- FEATURED WORK -->
+    <section class="section wrap" id="work" aria-labelledby="work-title">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">01 / Selected work</p>
+          <h2 class="section-title" id="work-title">
+            The game is a team effort.<br>
+            <span class="muted">Here’s my part.</span>
+          </h2>
+        </div>
+        <p>
+          Contribution briefs across published games, reconstruction work,
+          and personal systems development.
+        </p>
+      </div>
+
+      <div class="featured-grid" id="featured"></div>
+
+      <p class="caption">
+        Store visuals are credited to their respective publishers.
+        Illustrated covers are labeled. Team credits do not imply sole ownership.
+      </p>
+    </section>
+
+    <!-- COMPLETE CATALOGUE -->
+    <section class="section library-section" id="library" aria-labelledby="library-title">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div>
+            <p class="eyebrow">02 / Project library</p>
+            <h2 class="section-title" id="library-title">
+              More worlds.<br><span class="muted">More work.</span>
+            </h2>
+          </div>
+          <p>
+            Browse published team credits, unreleased work, personal projects,
+            earlier portfolio entries, and C++ projects.
+          </p>
+        </div>
+
+        <div class="library-tools" id="library-tools" hidden>
+          <label class="sr-only" for="search">Search projects and technologies</label>
+          <input class="search" id="search" type="search"
+                 placeholder="Search a game, system, or technology…"
+                 autocomplete="off" aria-controls="catalogue">
+
+          <div class="filter-group" role="group" aria-label="Filter projects">
+            <button class="filter" type="button" data-filter="all" aria-pressed="true">All</button>
+            <button class="filter" type="button" data-filter="published" aria-pressed="false">Published</button>
+            <button class="filter" type="button" data-filter="unreleased" aria-pressed="false">Unreleased</button>
+            <button class="filter" type="button" data-filter="personal" aria-pressed="false">Personal</button>
+            <button class="filter" type="button" data-filter="other" aria-pressed="false">Other work</button>
+            <button class="filter" type="button" data-filter="academic" aria-pressed="false">C++</button>
+          </div>
+        </div>
+
+        <p class="result-count" id="result-count" role="status" aria-live="polite"></p>
+        <div class="catalogue" id="catalogue"></div>
+        <p class="empty-state" id="empty-state" hidden>
+          No matching projects. Try another title or select “All”.
+        </p>
+
+        <noscript>
+          <p>
+            Published team credits: Supermarket &amp; Motel Simulator;
+            Cinema Movie Theatre Simulator; Bank Simulator Money Business;
+            SWAT Force Police Car Chase 3D; Ludo Lush;
+            Mall &amp; Fast Food Simulator 3D; Egg &amp; Ranch Farming Simulator;
+            Crime Scene Evidence Cleaner; Librarian Game Tidy Up Library;
+            Gun Shop Business Simulator 3D; Garments &amp; Cloth Factory Sim;
+            Pipa Combate Kite Simulator 3D; Power Washing Wash Simulator;
+            Car Test Junkyard Racing Game; Picture Puzzle Art Fun.
+          </p>
+          <p>
+            Other work: Citadel Slayer and Dominoes Multiplayer are unreleased.
+            Ranch Farm Simulator is personal and unpublished. Cafe Simulator’s
+            release status is unconfirmed. Janitor Simulator is in development,
+            with individual attribution pending. Kebab Simulator — Food Chef
+            appears in earlier portfolio material.
+          </p>
+          <p>
+            C++ projects: Game of Life, Snakes &amp; Ladders, Tic-Tac-Toe,
+            and Chess with an AI version. Enable JavaScript for searching,
+            contribution windows, and the interactive demo.
+          </p>
+        </noscript>
+      </div>
+    </section>
+
+    <!-- EXPERTISE -->
+    <section class="section wrap" id="expertise" aria-labelledby="skills-title">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">03 / Under the hood</p>
+          <h2 class="section-title" id="skills-title">
+            The systems behind<br><span class="muted">the experience.</span>
+          </h2>
+        </div>
+        <p>
+          Practical Unity development across player-facing features,
+          persistent state, and mobile production services.
+        </p>
+      </div>
+
+      <div class="skills-grid">
+        <article class="skill-card reveal">
+          <svg class="icon" aria-hidden="true"><use href="#i-code"></use></svg>
+          <h3>Gameplay<br>&amp; simulation</h3>
+          <p>
+            Gameplay mechanics, object placement, UI, physics-based simulation,
+            missions, and related feature development.
+          </p>
+          <div class="tags">
+            <span class="tag">Unity 2D / 3D</span>
+            <span class="tag">C#</span>
+            <span class="tag">OOP</span>
+            <span class="tag">UI</span>
+          </div>
+        </article>
+
+        <article class="skill-card reveal">
+          <svg class="icon" aria-hidden="true"><use href="#i-save"></use></svg>
+          <h3>Persistence<br>&amp; content</h3>
+          <p>
+            Save/load functionality and content-delivery work across mobile
+            simulation projects and personal systems.
+          </p>
+          <div class="tags">
+            <span class="tag">Save / load</span>
+            <span class="tag">Addressables</span>
+            <span class="tag">Play Asset Delivery</span>
+          </div>
+        </article>
+
+        <article class="skill-card reveal">
+          <svg class="icon" aria-hidden="true"><use href="#i-network"></use></svg>
+          <h3>Services<br>&amp; production</h3>
+          <p>
+            SDK integration, debugging, optimization, and working through
+            existing or inherited codebases.
+          </p>
+          <div class="tags">
+            <span class="tag">Firebase</span>
+            <span class="tag">AdMob</span>
+            <span class="tag">AppLovin</span>
+            <span class="tag">Google Play Services</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- PLAYABLE PORTFOLIO DEMO -->
+    <section class="wrap" id="lab" aria-labelledby="lab-title">
+      <div class="lab-panel reveal">
+        <div class="lab-copy">
+          <p class="eyebrow">04 / Intermission</p>
+          <h2 class="section-title" id="lab-title">
+            A little less scroll.<br><span class="accent">A little more play.</span>
+          </h2>
+          <span class="tag">MEMORY.MATCH / BROWSER DEMO</span>
+          <p>
+            Find the six matching pairs. There’s no timer—just a small
+            interaction to explore between the projects.
+          </p>
+          <p>
+            This JavaScript demo was created for the portfolio website.
+            It is separate from the Unity project credits above.
+          </p>
+          <button class="button" id="restart-memory" type="button" hidden>
+            Restart game ↻
+          </button>
+        </div>
+
+        <div class="memory-shell">
+          <div class="memory-head">
+            <span id="moves">Moves: 0</span>
+            <span id="matches">Pairs: 0 / 6</span>
+          </div>
+
+          <div class="memory-grid" id="memory-grid" role="group"
+               aria-label="Memory matching game"
+               aria-describedby="memory-message"></div>
+
+          <p class="memory-message" id="memory-message" role="status" aria-live="polite">
+            Enable JavaScript to play. Keyboard controls use Tab and Enter.
+          </p>
+          <div class="confetti" id="confetti" aria-hidden="true"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="section wrap" id="about" aria-labelledby="about-title">
+      <div class="about-grid">
+        <div class="about-copy">
+          <p class="eyebrow reveal">05 / Behind the code</p>
+          <h2 class="section-title reveal" id="about-title">
+            Muhammad Talha.<br><span class="muted">Developer at heart.</span>
+          </h2>
+
+          <p class="reveal">
+            I’m a <strong>Unity and C# game developer in Lahore</strong>.
+            My experience at Smarnovative Labs spans published mobile team
+            projects, simulation features, service integrations, debugging,
+            and optimization.
+          </p>
+
+          <p class="reveal">
+            I’ve also worked on inherited projects and reconstructed game
+            systems after original source material became unavailable.
+            This portfolio separates that work from published credits and
+            personal projects.
+          </p>
+
+          <div class="tags reveal">
+            <span class="tag">Git / GitHub</span>
+            <span class="tag">Trello</span>
+            <span class="tag">Web API integration</span>
+            <span class="tag">Socket networking</span>
+          </div>
+        </div>
+
+        <div class="timeline" id="timeline">
+          <article class="timeline-item reveal">
+            <span class="timeline-date">PROFESSIONAL EXPERIENCE / FROM 2022</span>
+            <h3>Smarnovative Labs</h3>
+            <p>
+              Unity game development across mobile team projects,
+              selected gameplay systems, and production features.
+            </p>
+          </article>
+
+          <article class="timeline-item reveal">
+            <span class="timeline-date">2015 — 2019 / EDUCATION</span>
+            <h3>University of Central Punjab</h3>
+            <p>BSCS · CGPA 3.38</p>
+          </article>
+
+          <article class="timeline-item reveal">
+            <span class="timeline-date">ACADEMIC &amp; PERSONAL BACKGROUND</span>
+            <h3>C++ projects &amp; research</h3>
+            <p>
+              C++ projects include Game of Life, Snakes &amp; Ladders,
+              Tic-Tac-Toe, and Chess with an AI version.
+              Research background includes DCNN-based brain tumor detection.
+            </p>
+          </article>
+        </div>
+      </div>
+
+      <div class="source-card reveal">
+        <div>
+          <h3>Find me on GitHub.</h3>
+          <p>Profile, repositories, and the source for this portfolio.</p>
+        </div>
+        <div class="actions">
+          <a class="button" href="https://github.com/talha-gamedev"
+             target="_blank" rel="noopener noreferrer">
+            GitHub profile ↗
+          </a>
+          <a class="button primary"
+             href="https://github.com/talha-gamedev/talha-gamedev.github.io"
+             target="_blank" rel="noopener noreferrer">
+            Portfolio source ↗
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="wrap" id="contact" aria-labelledby="contact-title">
+      <div class="contact reveal">
+        <div>
+          <p class="eyebrow">06 / Start a conversation</p>
+          <h2 id="contact-title">
+            Let’s build<br><span class="accent">what’s next.</span>
+          </h2>
+        </div>
+
+        <div class="contact-copy">
+          <p>
+            Have a Unity role or a game development project to discuss?
+            Let’s talk about the gameplay, the systems, and the work ahead.
+          </p>
+
+          <a class="button primary"
+             href="mailto:talhanisar29959@hotmail.com?subject=Unity%20game%20development%20opportunity">
+            Get in touch ↗
+          </a>
+
+          <div class="email-row">
+            <a id="email" href="mailto:talhanisar29959@hotmail.com">
+              talhanisar29959@hotmail.com
+            </a>
+            <button class="control" id="copy-email" type="button"
+                    aria-label="Copy email address" hidden>
+              <svg class="icon" aria-hidden="true"><use href="#i-copy"></use></svg>
+            </button>
+          </div>
+
+          <div class="social-links">
+            <a href="https://github.com/talha-gamedev"
+               target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+            <a href="https://www.linkedin.com/in/muhammad-talha-784985150/"
+               target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
+            <a href="./resume.pdf" download="Muhammad-Talha-Resume.pdf">Résumé ↓</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <span>© <span id="year">2026</span> Muhammad Talha · Unity &amp; C#</span>
+    <a href="#home">Back to top ↑</a>
+  </footer>
+
+  <dialog class="project-dialog" id="project-dialog" aria-labelledby="dialog-title">
+    <div class="dialog-head">
+      <p class="eyebrow" id="dialog-status">Project details</p>
+      <button class="close" id="close-dialog" type="button"
+              aria-label="Close project details">×</button>
+    </div>
+    <div class="dialog-cover" id="dialog-cover"></div>
+    <div class="dialog-body">
+      <h2 id="dialog-title" tabindex="-1"></h2>
+      <div id="dialog-content"></div>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const $ = (selector, parent = document) => parent.querySelector(selector);
+      const $$ = (selector, parent = document) =>
+        Array.from(parent.querySelectorAll(selector));
+
+      const root = document.documentElement;
+      const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+      const finePointer = matchMedia("(hover: hover) and (pointer: fine)");
+
+      const storage = {
+        get(key) {
+          try { return localStorage.getItem(key); }
+          catch { return null; }
+        },
+        set(key, value) {
+          try { localStorage.setItem(key, value); }
+          catch { /* Keep the preference in memory for this visit. */ }
+        }
+      };
+
+      const esc = value => String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;",
+        '"': "&quot;", "'": "&#39;"
+      }[char]));
+
+      const icon = name =>
+        `<svg aria-hidden="true"><use href="#i-${esc(name)}"></use></svg>`;
+
+      let userPaused = storage.get("talha-motion") === "off";
+      let motionEnabled = !userPaused && !reducedMotion.matches;
+      let refreshEffects = () => {};
+      let filterAnimations = [];
+
+      /*
+       * CONTENT BASIS
+       * - Professional-CV.pdf: main credits, scopes, and qualifications.
+       * - Muhammad-Talha-Resume.pdf: selected work and scope notes.
+       * - Earlier portfolio/resume HTML: Kebab and older naming variants.
+       *
+       * Store destinations were checked against official Google Play
+       * listings in September 2026. They are not proof of individual
+       * authorship. No download or performance metrics are claimed here.
+       *
+       * EDITING:
+       * Add or change projects in this array.
+       * package: an official Google Play package ID, or omit the field.
+       * art: an approved local image path or a store image URL.
+       */
+
+      const projects = [
+        {
+          id: "supermarket",
+          title: "Supermarket & Motel Simulator",
+          group: "published",
+          status: "Published · Team project",
+          icon: "store", hue: 92, featured: true,
+          summary: "Object placement, persistence, and simulation features within a published mobile team project.",
+          tags: ["Unity", "C#", "Save / load", "Addressables"],
+          details: [
+            "Contributed dynamic object placement and pool, gym, and laundry functionality.",
+            "Implemented save/load mechanisms for game data.",
+            "Worked with Google Play Services, Addressables, and Play Asset Delivery."
+          ],
+          scope: "Individual feature contributions within the development team—not sole ownership of the complete game.",
+          package: "com.peri.games.motel.supermarket.store.cashier.game",
+          art: "https://play-lh.googleusercontent.com/FkyspMQhskr_MbWMML98JcYoS8-7EqG3jZrNMfLLGSlVtu6B_1Cm3W4WOtKdafMKqa8F3R8aaR6BEv0cGwS0%3Dw526-h296"
+        },
+        {
+          id: "cinema",
+          title: "Cinema Movie Theatre Simulator",
+          aliases: "Cinema Simulator Movie Theatre",
+          group: "published",
+          status: "Published · Team project",
+          icon: "film", hue: 278, featured: true,
+          summary: "Canteen and employee systems, plus open cinema and sphere cinema features.",
+          tags: ["Unity", "Simulation", "UI", "Integration"],
+          details: [
+            "Contributed canteen and employee systems.",
+            "Worked on open cinema and sphere cinema features.",
+            "Provided related integration and support."
+          ],
+          scope: "These modules describe the confirmed contribution scope within the wider team project.",
+          package: "com.peri.game.cinema.simulator.movie.theatre.business",
+          art: "https://play-lh.googleusercontent.com/5JiAOHRNVGo-fRARpdua_N-7aiqQGksYPLh6chXQyGspU2PvgwXJKyoXWXnNTcD9hUjUI8apb9f8TH-79Q-cLQ%3Dw526-h296"
+        },
+        {
+          id: "bank",
+          title: "Bank Simulator Money Business",
+          group: "published",
+          status: "Published · Team project",
+          icon: "bank", hue: 200,
+          summary: "Bug fixing, optimization, and selected modules during a junior-development stage.",
+          tags: ["Unity", "Debugging", "Optimization"],
+          details: [
+            "Contributed bug fixing and optimization work.",
+            "Implemented selected modules and functionality during a junior-development stage."
+          ],
+          scope: "Team contribution. Specific performance improvements and complete feature ownership are not claimed.",
+          package: "com.peri.bank.game.simulator.money.tycoon.business.manager",
+          art: "https://play-lh.googleusercontent.com/UbtC6Z-U3YIwt-YckgEnZTlWINIVT-gn_P6TVBfnBULEANh3oEf5rf-pjl8azCFINyx98QwjavTdVEd9YdSdFw%3Dw526-h296"
+        },
+        {
+          id: "police",
+          title: "SWAT Force Police Car Chase 3D",
+          aliases: "Police Force",
+          group: "published",
+          status: "Published · Team project",
+          icon: "car", hue: 210,
+          summary: "Missions and related gameplay functionality on the Police Force project.",
+          tags: ["Unity", "Missions", "Gameplay"],
+          details: [
+            "Added missions and related gameplay functionality.",
+            "The project is referred to as Police Force in the professional materials."
+          ],
+          scope: "Individual mission and gameplay contributions within a team project.",
+          package: "com.peri.games.police.force.game.officer.car"
+        },
+        {
+          id: "citadel",
+          title: "Citadel Slayer",
+          group: "unreleased",
+          status: "Unreleased · Professional project",
+          icon: "sword", hue: 263, featured: true,
+          summary: "Reconstructed core Unity systems after the original project source became unavailable.",
+          tags: ["Unity", "Reconstruction", "Enemy systems"],
+          details: [
+            "Reconstructed and completed core Unity systems.",
+            "Created or expanded multiple enemy/villain archetypes.",
+            "Implemented related gameplay functionality."
+          ],
+          scope: "Unreleased professional project. No public release or player-performance claims are made."
+        },
+        {
+          id: "dominoes",
+          title: "Dominoes Multiplayer",
+          aliases: "Multiplayer Dominoes",
+          group: "unreleased",
+          status: "Completed · Unreleased",
+          icon: "dice", hue: 230,
+          summary: "Completed inherited game logic, multiplayer functionality, and UI.",
+          tags: ["Unity", "Multiplayer", "Game logic", "UI"],
+          details: [
+            "Completed inherited game logic.",
+            "Completed multiplayer functionality and the user interface.",
+            "Release was discontinued following a business decision to prioritize offline titles and reduce recurring server infrastructure costs."
+          ],
+          scope: "Completed but unreleased. Not presented as a published title or an operating multiplayer service."
+        },
+        {
+          id: "ranch",
+          title: "Ranch Farm Simulator",
+          group: "personal",
+          status: "Personal · Unpublished",
+          icon: "leaf", hue: 98, featured: true,
+          summary: "A personal farming project covering inventory, production, crop progression, and world persistence.",
+          tags: ["Unity", "Inventory", "Progression", "Persistence"],
+          details: [
+            "Catalog and inventory systems.",
+            "Animal production and crop progression.",
+            "World persistence documented in a static source review."
+          ],
+          scope: "Separate from the published Egg & Ranch Farming Simulator. Runtime recovery validation remains pending."
+        }
+      ];
+
+      const additionalCredits = [
+        ["ludo", "Ludo Lush", "dice", 275,
+         "ludo.lush.games.video.calling", ""],
+
+        ["mall", "Mall & Fast Food Simulator 3D", "store", 30,
+         "com.peri.game.mall.shopping.fast.food.simulator.business", ""],
+
+        ["eggs", "Egg & Ranch Farming Simulator", "leaf", 85,
+         "com.peri.games.egg.ranch.farming.empire.valley.simulator.game",
+         "Egg Ranch Farming Empire"],
+
+        ["crime", "Crime Scene Evidence Cleaner", "clean", 165,
+         "com.peri.games.crime.scene.evidence.cleaner", ""],
+
+        ["library", "Librarian Game Tidy Up Library", "book", 32,
+         "com.peri.games.Librarian.Game.Tidy.Up.Library", ""],
+
+        ["gun-shop", "Gun Shop Business Simulator 3D", "store", 210,
+         "com.peri.gun.shop.game.business.simulator.sound.manager", ""],
+
+        ["garments", "Garments & Cloth Factory Sim", "shirt", 310,
+         "com.peri.games.garments.clothing.store.shop.factory.simulator", ""],
+
+        ["kite", "Pipa Combate Kite Simulator 3D", "kite", 190,
+         "com.peri.pipa.combate.kite.fight.simulator",
+         "Pipa Combate Kite Fight"],
+
+        ["powerwash", "Power Washing Wash Simulator", "clean", 195,
+         "com.peri.games.power.wash.cleaning.simulator",
+         "Power Wash Cleaning Simulator"],
+
+        ["garage", "Car Test Junkyard Racing Game", "car", 20,
+         "com.PeriGames.CarJunkGarageRacingGame",
+         "Car Junk Garage Racing Game"],
+
+        ["picture-puzzle", "Picture Puzzle Art Fun", "grid", 275,
+         "com.peri.games.slide.picture.puzzle.art.fun",
+         "Slide Picture Puzzle Art Fun"]
+      ];
+
+      additionalCredits.forEach(([id, title, symbol, hue, packageId, aliases]) => {
+        projects.push({
+          id, title, aliases, hue,
+          icon: symbol,
+          package: packageId,
+          group: "published",
+          status: "Published · Team credit",
+          summary: "Additional published team credit as a Unity Developer.",
+          tags: ["Unity", "Team contribution"],
+          details: [
+            "Listed among the additional published team credits in my professional CV."
+          ],
+          scope: "Detailed individual feature scopes are not claimed for this credit."
+        });
+      });
+
+      projects.push(
+        {
+          id: "cafe",
+          title: "Cafe Simulator",
+          group: "other",
+          status: "Project status to confirm",
+          icon: "coffee", hue: 32,
+          summary: "Wall-painting, save/load functionality, and other gameplay elements.",
+          tags: ["Unity", "Wall painting", "Save / load"],
+          details: [
+            "Contributed a wall-painting system.",
+            "Contributed save/load functionality and other gameplay elements."
+          ],
+          scope: "The current public title and release status are not yet confirmed."
+        },
+        {
+          id: "janitor",
+          title: "Janitor Simulator",
+          group: "other",
+          status: "In development · Scope pending",
+          icon: "clean", hue: 170,
+          summary: "An in-development project with individual module attribution still to be confirmed.",
+          tags: ["Unity", "In development"],
+          details: [
+            "Source analysis identified interaction, tool-action, and task-progression modules.",
+            "This entry does not claim individual authorship of those modules."
+          ],
+          scope: "Project ownership and individual module authorship remain unconfirmed."
+        },
+        {
+          id: "kebab",
+          title: "Kebab Simulator — Food Chef",
+          aliases: "Kebab Food Chef Simulator Game",
+          group: "other",
+          status: "Earlier portfolio credit",
+          icon: "coffee", hue: 25,
+          summary: "Cooking-game credit retained from earlier portfolio material.",
+          tags: ["Unity", "Earlier portfolio"],
+          details: [
+            "Listed in the earlier portfolio and résumé.",
+            "The linked store listing uses the title Kebab Food Chef Simulator Game."
+          ],
+          scope: "Not included in the newer detailed contribution briefs. No specific module ownership is claimed here.",
+          package: "com.peri.games.kebab.simulater.food.chef"
+        }
+      );
+
+      [
+        ["life", "Game of Life", "grid", 150],
+        ["snakes", "Snakes & Ladders", "dice", 90],
+        ["tic-tac-toe", "Tic-Tac-Toe", "grid", 240],
+        ["chess", "Chess — AI version", "cube", 285]
+      ].forEach(([id, title, symbol, hue]) => {
+        projects.push({
+          id, title, hue, icon: symbol,
+          group: "academic",
+          status: "C++ project",
+          summary: "C++ project listed in my academic and personal background.",
+          tags: ["C++", "Game programming"],
+          details: [
+            `${title} is listed among my C++ projects in the professional materials.`
+          ],
+          scope: "Kept separate from published mobile team credits. A playable build or public source repository is not linked here."
+        });
+      });
+
+      const projectById = new Map(projects.map(project => [project.id, project]));
+
+      /* ====================================================
+         REVEAL OBSERVER — initialized before rendering
+         ==================================================== */
+
+      let revealObserver = null;
+
+      if ("IntersectionObserver" in window) {
+        revealObserver = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.remove("pending");
+              revealObserver.unobserve(entry.target);
+            }
+          });
+        }, { threshold: .08, rootMargin: "0px 0px -15px 0px" });
+      }
+
+      function watchReveals(elements) {
+        if (!motionEnabled || !revealObserver) return;
+
+        elements.forEach(element => {
+          element.classList.add("pending");
+          revealObserver.observe(element);
+        });
+      }
+
+      /* ====================================================
+         PROJECT RENDERING
+         ==================================================== */
+
+      function storeURL(project) {
+        return project.package
+          ? "https://play.google.com/store/apps/details?id=" +
+            encodeURIComponent(project.package)
+          : "";
+      }
+
+      function storeLink(project, button = false) {
+        const url = storeURL(project);
+        if (!url) return "";
+
+        return `<a class="${button ? "button primary" : "store-link"}"
+          href="${esc(url)}" target="_blank" rel="noopener noreferrer"
+          aria-label="${esc(project.title)} on Google Play, opens in a new tab">
+          Google Play ↗
+        </a>`;
+      }
+
+      function cover(project) {
+        return `
+          <div class="cover" style="--hue:${project.hue}">
+            <div class="cover-symbol" aria-hidden="true">${icon(project.icon)}</div>
+            ${project.art ? `
+              <img class="store-art" src="${esc(project.art)}"
+                   loading="lazy" decoding="async"
+                   alt="Official store promotional visual for ${esc(project.title)}">
+            ` : ""}
+            <span class="art-label">
+              ${project.art ? "Official store visual" : "Illustrative cover"}
+            </span>
+          </div>`;
+      }
+
+      function handleImageErrors(container) {
+        $$(".store-art", container).forEach(image => {
+          const fallback = () => {
+            image.hidden = true;
+            const label = $(".art-label", image.parentElement);
+            if (label) label.textContent = "Illustrative cover";
+          };
+
+          image.addEventListener("error", fallback, { once: true });
+          if (image.complete && image.naturalWidth === 0) fallback();
+        });
+      }
+
+      $("#featured").innerHTML = projects
+        .filter(project => project.featured)
+        .map(project => `
+          <article class="reveal">
+            <div class="feature-card" data-tilt>
+              ${cover(project)}
+              <div class="feature-copy">
+                <span class="project-status">${esc(project.status)}</span>
+                <h3>${esc(project.title)}</h3>
+                <p>${esc(project.summary)}</p>
+                <div class="tags">
+                  ${project.tags.map(tag => `<span class="tag">${esc(tag)}</span>`).join("")}
+                </div>
+                <div class="project-actions">
+                  <button class="text-button" type="button"
+                          data-project="${esc(project.id)}"
+                          aria-haspopup="dialog">
+                    Contribution brief ↗
+                  </button>
+                  ${storeLink(project)}
+                </div>
+              </div>
+            </div>
+          </article>
+        `).join("");
+
+      const catalogue = $("#catalogue");
+
+      catalogue.innerHTML = projects.map(project => `
+        <article class="catalogue-card" data-id="${esc(project.id)}">
+          <div class="catalogue-top">
+            <span class="game-icon" style="--hue:${project.hue}" aria-hidden="true">
+              ${icon(project.icon)}
+            </span>
+            <span class="project-status">${esc(project.status)}</span>
+          </div>
+          <h3>${esc(project.title)}</h3>
+          <p>${esc(project.summary)}</p>
+          <div class="project-actions">
+            <button class="text-button" type="button"
+                    data-project="${esc(project.id)}"
+                    aria-haspopup="dialog">
+              View scope ↗
+            </button>
+            ${storeLink(project)}
+          </div>
+        </article>
+      `).join("");
+
+      handleImageErrors($("#featured"));
+      $("#library-tools").hidden = false;
+
+      const catalogueCards = $$(".catalogue-card", catalogue);
+      const search = $("#search");
+      const filters = $$(".filter");
+      let selectedFilter = "all";
+
+      function applyFilter(animate = true) {
+        filterAnimations.forEach(animation => animation.cancel());
+        filterAnimations = [];
+
+        const query = search.value.trim().toLowerCase();
+
+        const previous = new Map(
+          catalogueCards
+            .filter(card => !card.hidden)
+            .map(card => [card, card.getBoundingClientRect()])
+        );
+
+        let visibleCount = 0;
+
+        catalogueCards.forEach(card => {
+          const project = projectById.get(card.dataset.id);
+          const haystack = [
+            project.title, project.aliases || "", project.summary,
+            project.status, ...project.tags
+          ].join(" ").toLowerCase();
+
+          const matchesCategory =
+            selectedFilter === "all" || project.group === selectedFilter;
+
+          card.hidden = !(matchesCategory && haystack.includes(query));
+          if (!card.hidden) visibleCount++;
+        });
+
+        if (animate && motionEnabled && typeof Element.prototype.animate === "function") {
+          catalogueCards.filter(card => !card.hidden).forEach((card, index) => {
+            const before = previous.get(card);
+            const after = card.getBoundingClientRect();
+
+            const frames = before
+              ? [
+                  {
+                    transform: `translate(${before.left - after.left}px, ${before.top - after.top}px)`,
+                    opacity: 1
+                  },
+                  { transform: "translate(0, 0)", opacity: 1 }
+                ]
+              : [
+                  { transform: "translateY(12px)", opacity: 0 },
+                  { transform: "translateY(0)", opacity: 1 }
+                ];
+
+            filterAnimations.push(card.animate(frames, {
+              duration: 340,
+              delay: before ? 0 : Math.min(index * 20, 100),
+              easing: "cubic-bezier(.22,1,.36,1)",
+              fill: "backwards"
+            }));
+          });
+        }
+
+        $("#result-count").textContent =
+          `${visibleCount} of ${projects.length} catalogue entries shown`;
+
+        $("#empty-state").hidden = visibleCount !== 0;
+
+        filters.forEach(button => {
+          button.setAttribute(
+            "aria-pressed",
+            String(button.dataset.filter === selectedFilter)
+          );
+        });
+
+        scheduleScroll();
+      }
+
+      filters.forEach(button => {
+        button.addEventListener("click", () => {
+          selectedFilter = button.dataset.filter;
+          applyFilter();
+        });
+      });
+
+      search.addEventListener("input", () => applyFilter());
+      // Initial filtering is called near the end, after scroll setup.
+
+      /* ====================================================
+         NATIVE PROJECT DIALOG
+         ==================================================== */
+
+      const dialog = $("#project-dialog");
+      let dialogOpener = null;
+      let previousOverflow = "";
+
+      function openProject(project, opener) {
+        $("#dialog-title").textContent = project.title;
+        $("#dialog-status").textContent = project.status;
+        $("#dialog-cover").innerHTML = cover(project);
+
+        $("#dialog-content").innerHTML = `
+          <p>${esc(project.summary)}</p>
+          <div class="tags">
+            ${project.tags.map(tag => `<span class="tag">${esc(tag)}</span>`).join("")}
+          </div>
+          <h3>Contribution &amp; scope</h3>
+          <ul>${project.details.map(detail => `<li>${esc(detail)}</li>`).join("")}</ul>
+          <div class="scope">${esc(project.scope)}</div>
+          ${storeLink(project, true)}
+        `;
+
+        handleImageErrors($("#dialog-cover"));
+
+        if (typeof dialog.showModal !== "function") {
+          window.alert(
+            project.title + "\n\n" +
+            project.details.join("\n\n") + "\n\n" + project.scope
+          );
+          return;
+        }
+
+        if (dialog.open) return;
+
+        dialogOpener = opener;
+        previousOverflow = document.body.style.overflow;
+        dialog.showModal();
+        document.body.style.overflow = "hidden";
+        dialog.scrollTop = 0;
+        $("#dialog-title").focus({ preventScroll: true });
+      }
+
+      document.addEventListener("click", event => {
+        const button = event.target.closest("[data-project]");
+        if (!button) return;
+
+        const project = projectById.get(button.dataset.project);
+        if (project) openProject(project, button);
+      });
+
+      $("#close-dialog").addEventListener("click", () => dialog.close());
+
+      dialog.addEventListener("click", event => {
+        if (event.target !== dialog) return;
+        const rect = dialog.getBoundingClientRect();
+
+        if (
+          event.clientX < rect.left || event.clientX > rect.right ||
+          event.clientY < rect.top || event.clientY > rect.bottom
+        ) {
+          dialog.close();
+        }
+      });
+
+      dialog.addEventListener("close", () => {
+        document.body.style.overflow = previousOverflow;
+        if (dialogOpener?.isConnected) {
+          dialogOpener.focus({ preventScroll: true });
+        }
+        dialogOpener = null;
+      });
+
+      /* ====================================================
+         NAVIGATION
+         ==================================================== */
+
+      const header = $(".site-header");
+      const nav = $("#nav");
+      const menuButton = $("#menu-toggle");
+
+      function setMenu(open, returnFocus = false) {
+        nav.classList.toggle("open", open);
+        menuButton.setAttribute("aria-expanded", String(open));
+        menuButton.textContent = open ? "Close" : "Menu";
+        if (returnFocus) menuButton.focus();
+      }
+
+      menuButton.hidden = false;
+      menuButton.addEventListener("click", () => {
+        setMenu(menuButton.getAttribute("aria-expanded") !== "true");
+      });
+
+      $$("a", nav).forEach(link => {
+        link.addEventListener("click", () => setMenu(false));
+      });
+
+      document.addEventListener("pointerdown", event => {
+        if (!header.contains(event.target)) setMenu(false);
+      });
+
+      document.addEventListener("keydown", event => {
+        if (
+          event.key === "Escape" &&
+          menuButton.getAttribute("aria-expanded") === "true"
+        ) {
+          setMenu(false, true);
+        }
+      });
+
+      root.classList.add("enhanced");
+
+      /* ====================================================
+         SCROLL PROGRESS / ACTIVE SECTION / TIMELINE
+         ==================================================== */
+
+      const progress = $("#progress");
+      const timeline = $("#timeline");
+      const sections = $$("main section[id]");
+      const navLinks = $$("a", nav);
+      let scrollPending = false;
+
+      function updateScroll() {
+        scrollPending = false;
+
+        const distance = root.scrollHeight - root.clientHeight;
+        const amount = distance > 0
+          ? Math.min(1, Math.max(0, scrollY / distance))
+          : 0;
+
+        progress.style.transform = `scaleX(${amount})`;
+
+        let current = "home";
+        sections.forEach(section => {
+          if (section.getBoundingClientRect().top <= 150) current = section.id;
+        });
+
+        navLinks.forEach(link => {
+          const active = link.getAttribute("href") === "#" + current;
+          link.classList.toggle("active", active);
+          if (active) link.setAttribute("aria-current", "location");
+          else link.removeAttribute("aria-current");
+        });
+
+        const rect = timeline.getBoundingClientRect();
+        const timelineProgress = Math.max(
+          0, Math.min(1, (innerHeight * .8 - rect.top) / Math.max(rect.height, 1))
+        );
+
+        timeline.style.setProperty("--timeline-progress", timelineProgress);
+      }
+
+      function scheduleScroll() {
+        if (scrollPending) return;
+        scrollPending = true;
+        requestAnimationFrame(updateScroll);
+      }
+
+      addEventListener("scroll", scheduleScroll, { passive: true });
+      addEventListener("resize", () => {
+        if (innerWidth > 680) setMenu(false);
+        scheduleScroll();
+      }, { passive: true });
+      addEventListener("load", scheduleScroll);
+
+      /* ====================================================
+         THEME / MOTION PREFERENCES
+         ==================================================== */
+
+      const themeButton = $("#theme-toggle");
+      const motionButton = $("#motion-toggle");
+
+      function applyTheme(theme) {
+        root.dataset.theme = theme;
+        themeButton.textContent = theme === "dark" ? "☼ Light" : "◐ Dark";
+        themeButton.setAttribute(
+          "aria-label", theme === "dark" ? "Use light theme" : "Use dark theme"
+        );
+        $("#theme-color").content = theme === "dark" ? "#0c1011" : "#f5f6ef";
+        storage.set("talha-theme", theme);
+        refreshEffects();
+      }
+
+      function applyMotion() {
+        motionEnabled = !userPaused && !reducedMotion.matches;
+        root.classList.toggle("motion-off", !motionEnabled);
+        motionButton.textContent = motionEnabled ? "Motion on" : "Motion off";
+        motionButton.setAttribute("aria-pressed", String(motionEnabled));
+        motionButton.disabled = reducedMotion.matches;
+        motionButton.title = reducedMotion.matches
+          ? "Your system reduced-motion preference is respected."
+          : "Pause or enable decorative animations.";
+
+        if (!motionEnabled) {
+          filterAnimations.forEach(animation => animation.cancel());
+          $$(".reveal.pending").forEach(element => element.classList.remove("pending"));
+          $$("[data-tilt]").forEach(element => {
+            element.style.setProperty("--rx", "0deg");
+            element.style.setProperty("--ry", "0deg");
+          });
+        }
+
+        refreshEffects();
+      }
+
+      themeButton.hidden = false;
+      motionButton.hidden = false;
+
+      themeButton.addEventListener("click", () => {
+        applyTheme(root.dataset.theme === "dark" ? "light" : "dark");
+      });
+
+      motionButton.addEventListener("click", () => {
+        userPaused = !userPaused;
+        storage.set("talha-motion", userPaused ? "off" : "on");
+        applyMotion();
+      });
+
+      if (typeof reducedMotion.addEventListener === "function") {
+        reducedMotion.addEventListener("change", applyMotion);
+      } else {
+        reducedMotion.addListener(applyMotion);
+      }
+
+      /* ====================================================
+         POINTER TILT
+         ==================================================== */
+
+      $$("[data-tilt]").forEach(element => {
+        let frame = 0;
+        let rotateX = 0;
+        let rotateY = 0;
+
+        function reset() {
+          cancelAnimationFrame(frame);
+          frame = 0;
+          element.style.setProperty("--rx", "0deg");
+          element.style.setProperty("--ry", "0deg");
+        }
+
+        element.addEventListener("pointermove", event => {
+          if (!motionEnabled || !finePointer.matches || event.pointerType !== "mouse") return;
+
+          const rect = element.getBoundingClientRect();
+          const x = (event.clientX - rect.left) / rect.width - .5;
+          const y = (event.clientY - rect.top) / rect.height - .5;
+          rotateX = -y * 4;
+          rotateY = x * 4;
+
+          if (!frame) {
+            frame = requestAnimationFrame(() => {
+              frame = 0;
+              if (!motionEnabled) return reset();
+              element.style.setProperty("--rx", rotateX + "deg");
+              element.style.setProperty("--ry", rotateY + "deg");
+            });
+          }
+        });
+
+        element.addEventListener("pointerleave", reset);
+        element.addEventListener("pointercancel", reset);
+      });
+
+      /* ====================================================
+         MEMORY GAME
+         ==================================================== */
+
+      const memoryGrid = $("#memory-grid");
+      const memoryMessage = $("#memory-message");
+      const pairLabels = ["Unity", "C#", "Save", "Git", "API", "UI"];
+
+      let deck = [];
+      let selectedCards = [];
+      let locked = false;
+      let moves = 0;
+      let matchedPairs = 0;
+      let mismatchTimer = 0;
+      let confettiTimer = 0;
+
+      function shuffled(values) {
+        const result = [...values];
+        for (let index = result.length - 1; index > 0; index--) {
+          const other = Math.floor(Math.random() * (index + 1));
+          [result[index], result[other]] = [result[other], result[index]];
+        }
+        return result;
+      }
+
+      function syncGameScore() {
+        $("#moves").textContent = `Moves: ${moves}`;
+        $("#matches").textContent = `Pairs: ${matchedPairs} / ${pairLabels.length}`;
+      }
+
+      function celebrate() {
+        if (!motionEnabled) return;
+
+        const holder = $("#confetti");
+        clearTimeout(confettiTimer);
+        holder.replaceChildren();
+
+        for (let index = 0; index < 18; index++) {
+          const spark = document.createElement("span");
+          spark.className = "spark";
+          spark.style.setProperty("--x", `${(Math.random() - .5) * 390}px`);
+          spark.style.setProperty("--y", `${(Math.random() - .5) * 300}px`);
+          spark.style.background = index % 2 ? "var(--blue)" : "var(--accent)";
+          holder.append(spark);
+        }
+
+        confettiTimer = setTimeout(() => holder.replaceChildren(), 1100);
+      }
+
+      function resetGame() {
+        clearTimeout(mismatchTimer);
+        clearTimeout(confettiTimer);
+        $("#confetti").replaceChildren();
+
+        deck = shuffled([...pairLabels, ...pairLabels]);
+        selectedCards = [];
+        locked = false;
+        moves = 0;
+        matchedPairs = 0;
+
+        memoryGrid.innerHTML = deck.map((label, index) => `
+          <button class="memory-card" type="button" data-card="${index}"
+                  aria-label="Card ${index + 1}, face down"
+                  aria-pressed="false">
+            <span class="memory-inner" aria-hidden="true">
+              <span class="memory-face memory-front">?</span>
+              <span class="memory-face memory-back">${esc(label)}</span>
+            </span>
+          </button>
+        `).join("");
+
+        syncGameScore();
+        memoryMessage.textContent =
+          "Choose two cards. Keyboard: Tab to a card, then Enter or Space.";
+      }
+
+      memoryGrid.addEventListener("click", event => {
+        const button = event.target.closest("[data-card]");
+        if (!button || locked || button.classList.contains("open")) return;
+
+        const index = Number(button.dataset.card);
+        const label = deck[index];
+
+        button.classList.add("open");
+        button.setAttribute("aria-pressed", "true");
+        button.setAttribute("aria-label", `Card ${index + 1}, ${label}`);
+        selectedCards.push({ button, index, label });
+
+        if (selectedCards.length === 1) {
+          memoryMessage.textContent = `${label} revealed. Choose another card.`;
+          return;
+        }
+
+        moves++;
+        syncGameScore();
+
+        const [first, second] = selectedCards;
+
+        if (first.label === second.label) {
+          selectedCards.forEach(card => {
+            card.button.classList.add("matched");
+            card.button.setAttribute("aria-disabled", "true");
+            card.button.setAttribute(
+              "aria-label", `Card ${card.index + 1}, ${card.label}, matched`
+            );
+          });
+
+          matchedPairs++;
+          selectedCards = [];
+          syncGameScore();
+
+          if (matchedPairs === pairLabels.length) {
+            memoryMessage.textContent =
+              `All six pairs found in ${moves} moves. Nicely played!`;
+            celebrate();
+          } else {
+            memoryMessage.textContent =
+              `${first.label} pair matched. Find the next pair.`;
+          }
+        } else {
+          locked = true;
+          memoryMessage.textContent =
+            `${first.label} and ${second.label}. Not a match.`;
+
+          mismatchTimer = setTimeout(() => {
+            selectedCards.forEach(card => {
+              card.button.classList.remove("open");
+              card.button.setAttribute("aria-pressed", "false");
+              card.button.setAttribute(
+                "aria-label", `Card ${card.index + 1}, face down`
+              );
+            });
+
+            selectedCards = [];
+            locked = false;
+            memoryMessage.textContent = "Try another pair.";
+          }, 1000);
+        }
+      });
+
+      $("#restart-memory").hidden = false;
+      $("#restart-memory").addEventListener("click", resetGame);
+      resetGame();
+
+      /* ====================================================
+         EMAIL COPY / PORTRAIT FALLBACK
+         ==================================================== */
+
+      let toastTimer = 0;
+
+      function showToast(message) {
+        const toast = $("#toast");
+        clearTimeout(toastTimer);
+        toast.textContent = message;
+        toast.classList.add("visible");
+        toastTimer = setTimeout(() => toast.classList.remove("visible"), 3500);
+      }
+
+      $("#copy-email").hidden = false;
+      $("#copy-email").addEventListener("click", async () => {
+        const emailElement = $("#email");
+        const email = emailElement.textContent.trim();
+
+        try {
+          if (!navigator.clipboard?.writeText) throw new Error("Clipboard unavailable");
+          await navigator.clipboard.writeText(email);
+          showToast("Email address copied.");
+        } catch {
+          const selection = window.getSelection();
+
+          if (selection) {
+            const range = document.createRange();
+            range.selectNodeContents(emailElement);
+            selection.removeAllRanges();
+            selection.addRange(range);
+            showToast("Email selected. Use your device’s Copy command.");
+          } else {
+            showToast(email);
+          }
+        }
+      });
+
+      const portrait = $("#portrait");
+      portrait.addEventListener("error", () => { portrait.hidden = true; });
+      if (portrait.complete && portrait.naturalWidth === 0) portrait.hidden = true;
+
+      /* ====================================================
+         AMBIENT PARTICLES
+         ==================================================== */
+
+      const canvas = $("#particles");
+      let context = null;
+
+      try { context = canvas.getContext("2d"); }
+      catch { canvas.hidden = true; }
+
+      if (context) {
+        let width = innerWidth;
+        let height = innerHeight;
+        let frame = 0;
+        let lastTime = 0;
+        let color = "#c7f786";
+        let points = [];
+
+        function createPoints() {
+          const count = width < 680 ? 24 : 40;
+          points = Array.from({ length: count }, () => ({
+            x: Math.random(),
+            y: Math.random(),
+            speed: 5 + Math.random() * 10,
+            drift: (Math.random() - .5) * 6
+          }));
+        }
+
+        function paint() {
+          context.clearRect(0, 0, width, height);
+          context.fillStyle = color;
+          context.strokeStyle = color;
+
+          for (let a = 0; a < points.length; a++) {
+            const point = points[a];
+            const x = point.x * width;
+            const y = point.y * height;
+
+            context.globalAlpha = .45;
+            context.beginPath();
+            context.arc(x, y, 1.3, 0, Math.PI * 2);
+            context.fill();
+
+            for (let b = a + 1; b < points.length; b++) {
+              const other = points[b];
+              const dx = x - other.x * width;
+              const dy = y - other.y * height;
+              const distanceSquared = dx * dx + dy * dy;
+
+              if (distanceSquared < 110 * 110) {
+                context.globalAlpha = .12 * (1 - Math.sqrt(distanceSquared) / 110);
+                context.beginPath();
+                context.moveTo(x, y);
+                context.lineTo(other.x * width, other.y * height);
+                context.stroke();
+              }
+            }
+          }
+
+          context.globalAlpha = 1;
+        }
+
+        function shouldRun() {
+          return motionEnabled && !document.hidden;
+        }
+
+        function tick(timestamp) {
+          frame = 0;
+          if (!shouldRun()) { lastTime = 0; return; }
+
+          const dt = lastTime ? Math.min((timestamp - lastTime) / 1000, .04) : 1 / 60;
+          lastTime = timestamp;
+
+          points.forEach(point => {
+            point.y = (point.y - point.speed * dt / height + 1) % 1;
+            point.x = (point.x + point.drift * dt / width + 1) % 1;
+          });
+
+          paint();
+          frame = requestAnimationFrame(tick);
+        }
+
+        function reconcile() {
+          color = getComputedStyle(root).getPropertyValue("--accent").trim();
+
+          if (!shouldRun()) {
+            cancelAnimationFrame(frame);
+            frame = 0;
+            lastTime = 0;
+            paint();
+          } else if (!frame) {
+            lastTime = 0;
+            frame = requestAnimationFrame(tick);
+          }
+        }
+
+        function resizeCanvas() {
+          width = Math.max(1, innerWidth);
+          height = Math.max(1, innerHeight);
+          const ratio = Math.min(devicePixelRatio || 1, 2);
+
+          canvas.width = Math.round(width * ratio);
+          canvas.height = Math.round(height * ratio);
+          context.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+          createPoints();
+          reconcile();
+        }
+
+        refreshEffects = reconcile;
+        addEventListener("resize", resizeCanvas, { passive: true });
+        resizeCanvas();
+      }
+
+      document.addEventListener("visibilitychange", () => {
+        root.classList.toggle("tab-hidden", document.hidden);
+        refreshEffects();
+      });
+
+      if ("IntersectionObserver" in window) {
+        const ambientObserver = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            entry.target.classList.toggle("offscreen", !entry.isIntersecting);
+          });
+        }, { rootMargin: "80px" });
+
+        $$(".ambient-scope").forEach(element => ambientObserver.observe(element));
+      }
+
+      /* ====================================================
+         INITIALIZATION
+         ==================================================== */
+
+      $("#year").textContent = String(new Date().getFullYear());
+
+      applyTheme(root.dataset.theme === "light" ? "light" : "dark");
+      applyMotion();
+      applyFilter(false);
+      watchReveals($$(".reveal"));
+      updateScroll();
+
+      if (document.fonts?.ready) {
+        document.fonts.ready.then(scheduleScroll);
+      }
+    })();
+  </script>
+</body>
+</html>
